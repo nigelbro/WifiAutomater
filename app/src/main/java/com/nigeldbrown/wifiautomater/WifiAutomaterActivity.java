@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -44,11 +45,7 @@ public class WifiAutomaterActivity extends AppCompatActivity implements Compound
         toggle.setOnCheckedChangeListener(this);
         wifiReciever = new WiFiScanReceiver();
 
-        if(Build.VERSION.SDK_INT < 23){
-
-                //Turn on Wifi and Connect
-
-        }else{
+        if(Build.VERSION.SDK_INT >= 23){
 
             Dexter.checkPermissions(new MultiplePermissionsListener() {
                 @Override
@@ -64,6 +61,8 @@ public class WifiAutomaterActivity extends AppCompatActivity implements Compound
                 }
             }, Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.CHANGE_WIFI_STATE,Manifest.permission.WAKE_LOCK);
 
+
+
         }
 
     }
@@ -72,7 +71,17 @@ public class WifiAutomaterActivity extends AppCompatActivity implements Compound
 
         if(isChecked){
             manager.setWifiEnabled(true);
-            manager.startScan();
+            WifiConfiguration wifiConfig = new WifiConfiguration();
+            wifiConfig.SSID = String.format("\"%s\"", "ssid");
+            wifiConfig.preSharedKey = String.format("\"%s\"", "ssss");
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(getApplicationContext().WIFI_SERVICE);
+            int networkId = wifiManager.getConnectionInfo().getNetworkId();
+            wifiManager.removeNetwork(networkId);
+            wifiManager.saveConfiguration();
+            int netId = wifiManager.addNetwork(wifiConfig);
+            wifiManager.disconnect();
+            wifiManager.enableNetwork(netId, true);
+            wifiManager.reconnect();
         }else{
             manager.setWifiEnabled(false);
             unregisterReceiver(wifiReciever);
@@ -83,19 +92,12 @@ public class WifiAutomaterActivity extends AppCompatActivity implements Compound
     class WiFiScanReceiver extends BroadcastReceiver {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
-            //if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-            //    wifiScanResult = wifiManager.getScanResults();
-
-
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
                 List<ScanResult> wifiScanResultList = manager.getScanResults();
                 for (int i = 0; i < wifiScanResultList.size(); i++) {
                     ScanResult accessPoint = wifiScanResultList.get(i);
                     String listItem = " Name: " + accessPoint.SSID +    " \n Mac: " + accessPoint.BSSID + "\n Signal Strenght: " + accessPoint.level+ "dBm";
                     Log.i("Wifi",listItem);
-
-
                 }
             }
 
@@ -108,7 +110,6 @@ public class WifiAutomaterActivity extends AppCompatActivity implements Compound
         super.onResume();
         IntentFilter wifi = new IntentFilter();
         wifi.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        wifi.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(wifiReciever,wifi);
     }
 
