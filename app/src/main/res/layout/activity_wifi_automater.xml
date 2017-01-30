@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_wifi_automater"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.nigeldbrown.wifiautomater.WifiAutomaterActivity">
+
+    <RelativeLayout
+        android:padding="5pt"
+        android:background="#50ff8900"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Wifi"
+                android:textColor="#727272"
+                android:textSize="14pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/status"
+                android:text="Not connected"
+                android:textColor="#ff8900"
+                android:textSize="8pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+
+        <Switch
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/wifitoggleButton" />
+    </RelativeLayout>
+
+</RelativeLayout>
